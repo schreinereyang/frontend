@@ -1,79 +1,126 @@
 // pages/dashboard.js
 import Link from 'next/link';
-import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Lun', earnings: 120 },
-  { name: 'Mar', earnings: 240 },
-  { name: 'Mer', earnings: 180 },
-  { name: 'Jeu', earnings: 320 },
-  { name: 'Ven', earnings: 300 },
-  { name: 'Sam', earnings: 400 },
-  { name: 'Dim', earnings: 350 },
+const earnings = [
+  { name: 'Lun', value: 140 },
+  { name: 'Mar', value: 240 },
+  { name: 'Mer', value: 190 },
+  { name: 'Jeu', value: 300 },
+  { name: 'Ven', value: 280 },
+  { name: 'Sam', value: 350 },
+  { name: 'Dim', value: 290 },
+];
+
+const models = [
+  {
+    name: 'Sophia AI',
+    sales: 430,
+    chats: ['Got it. I’ll take care of it.', 'I miss you too! Wanna...'],
+    avatars: ['/a1.png', '/a2.png', '/a3.png'],
+  },
+  {
+    name: 'ClaraBot',
+    sales: 250,
+    chats: ['Hi! Don’t hesitate if yo..', 'I remember. How can I assist you?'],
+    avatars: ['/a4.png', '/a5.png'],
+  },
+  {
+    name: 'EVA',
+    sales: 150,
+    chats: ['Did you see my latest p..', 'Right. Tell me everything'],
+    avatars: ['/a6.png'],
+  },
 ];
 
 export default function Dashboard() {
-  const [period, setPeriod] = useState('Semaine');
-
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="flex min-h-screen bg-[#0b0f1a] text-white">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md p-6 space-y-4">
-        <h1 className="text-2xl font-extrabold text-indigo-600">OnlyMoly</h1>
-        <nav className="space-y-2 text-gray-700">
-          <Link href="/dashboard" className="block hover:text-indigo-600">🏠 Dashboard</Link>
-          <Link href="/import" className="block hover:text-indigo-600">📥 Import</Link>
-          <Link href="/models" className="block hover:text-indigo-600">🤖 Modèles</Link>
-          <Link href="/medias" className="block hover:text-indigo-600">🎥 Médias</Link>
-          <Link href="/scripts" className="block hover:text-indigo-600">✍️ Scripts</Link>
-          <Link href="/ia" className="block hover:text-indigo-600">🧠 IA</Link>
-          <Link href="/settings" className="block hover:text-indigo-600">⚙️ Paramètres</Link>
+      <aside className="w-16 hover:w-56 bg-[#131b2c] p-4 transition-all duration-300 space-y-6 overflow-hidden">
+        <h1 className="text-xl font-bold text-purple-400">OnlyMoly</h1>
+        <nav className="space-y-4">
+          <SidebarLink href="/dashboard" icon="📊" label="Dashboard" />
+          <SidebarLink href="/import" icon="📥" label="Import" />
+          <SidebarLink href="/models" icon="🤖" label="Modèles" />
+          <SidebarLink href="/medias" icon="🎥" label="Médias" />
+          <SidebarLink href="/scripts" icon="✍️" label="Scripts" />
+          <SidebarLink href="/ia" icon="🧠" label="IA" />
+          <SidebarLink href="/settings" icon="⚙️" label="Paramètres" />
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-10">
-        <h2 className="text-3xl font-bold mb-6">📊 Dashboard</h2>
-
-        {/* Résumé */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
-          <Card title="Revenus" value="€1 420" />
-          <Card title="Messages IA" value="312" />
-          <Card title="Médias vendus" value="48" />
-          <Card title="Abonnés actifs" value="92" />
-          <Card title="IA actives" value="6" />
+      {/* Main content */}
+      <main className="flex-1 p-8">
+        {/* KPI Top Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+          <StatCard title="Revenus" value="€1420" />
+          <StatCard title="Messages IA" value="312" />
+          <StatCard title="Médias vendus" value="48" />
+          <StatCard title="Abonnés actifs" value="92" />
+          <StatCard title="IA actives" value="6" />
         </div>
 
-        {/* Graphique */}
-        <div className="bg-white rounded-lg shadow p-6">
+        {/* Earnings Chart */}
+        <div className="bg-[#131b2c] rounded-lg shadow-lg p-6 mb-10">
           <div className="flex justify-between mb-4">
-            <h3 className="text-xl font-semibold">📈 Chatting Earnings ({period})</h3>
-            <select value={period} onChange={e => setPeriod(e.target.value)} className="border rounded px-2 py-1">
-              <option>Semaine</option>
-              <option>Mois</option>
-              <option>Hier</option>
+            <h2 className="text-lg font-semibold">📈 Earnings IA</h2>
+            <select className="bg-[#0b0f1a] text-white border border-purple-500 px-2 py-1 rounded">
+              <option>Yesterday</option>
+              <option selected>Semaine</option>
+              <option>This Month</option>
             </select>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="earnings" stroke="#6366f1" strokeWidth={3} />
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={earnings}>
+              <XAxis dataKey="name" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#6b21a8' }} />
+              <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* Models Preview */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {models.map((m, i) => (
+            <div key={i} className="bg-[#131b2c] p-4 rounded-xl shadow-lg">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-bold text-purple-400">{m.name}</h3>
+                <span className="text-sm text-purple-300">Sales €{m.sales}</span>
+              </div>
+              <div className="flex space-x-1 mb-2">
+                {m.avatars.map((a, j) => (
+                  <img key={j} src={a} alt="avatar" className="w-6 h-6 rounded-full border border-white" />
+                ))}
+              </div>
+              <div className="text-sm space-y-1">
+                {m.chats.map((c, j) => (
+                  <p key={j} className="truncate text-gray-300">{c}</p>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </main>
     </div>
   );
 }
 
-function Card({ title, value }) {
+function SidebarLink({ href, icon, label }) {
   return (
-    <div className="bg-white p-4 rounded-lg shadow text-center">
-      <h4 className="text-sm font-semibold text-gray-500">{title}</h4>
-      <p className="text-2xl font-bold text-indigo-600 mt-1">{value}</p>
+    <Link href={href} className="flex items-center space-x-2 hover:text-purple-400">
+      <span className="text-xl">{icon}</span>
+      <span className="hidden lg:inline">{label}</span>
+    </Link>
+  );
+}
+
+function StatCard({ title, value }) {
+  return (
+    <div className="bg-[#131b2c] p-4 rounded-xl text-center shadow border border-purple-500">
+      <h4 className="text-sm text-gray-400">{title}</h4>
+      <p className="text-2xl font-bold text-purple-400">{value}</p>
     </div>
   );
 }
