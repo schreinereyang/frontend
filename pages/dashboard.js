@@ -1,4 +1,5 @@
 // pages/dashboard.js
+import { useState } from 'react';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -34,24 +35,30 @@ const models = [
 ];
 
 export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-[#0b0f1a] text-white">
       {/* Sidebar */}
-      <aside className="w-16 hover:w-56 bg-[#131b2c] p-4 transition-all duration-300 space-y-6 overflow-hidden">
-        <h1 className="text-xl font-bold text-purple-400">OnlyMoly</h1>
-        <nav className="space-y-4">
-          <SidebarLink href="/dashboard" icon="📊" label="Dashboard" />
-          <SidebarLink href="/import" icon="📥" label="Import" />
-          <SidebarLink href="/models" icon="🤖" label="Modèles" />
-          <SidebarLink href="/medias" icon="🎥" label="Médias" />
-          <SidebarLink href="/scripts" icon="✍️" label="Scripts" />
-          <SidebarLink href="/ia" icon="🧠" label="IA" />
-          <SidebarLink href="/settings" icon="⚙️" label="Paramètres" />
+      <aside
+        onMouseEnter={() => setSidebarOpen(true)}
+        onMouseLeave={() => setSidebarOpen(false)}
+        className={`bg-[#0b0f1a] border-r border-purple-800 p-4 transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-16'} overflow-hidden fixed h-screen z-10`}
+      >
+        <h1 className={`text-xl font-bold text-purple-400 transition-opacity ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>OnlyMoly</h1>
+        <nav className="space-y-6 mt-8">
+          <SidebarLink open={sidebarOpen} href="/dashboard" icon="📊" label="Dashboard" />
+          <SidebarLink open={sidebarOpen} href="/import" icon="📥" label="Import" />
+          <SidebarLink open={sidebarOpen} href="/models" icon="🤖" label="Modèles" />
+          <SidebarLink open={sidebarOpen} href="/medias" icon="🎥" label="Médias" />
+          <SidebarLink open={sidebarOpen} href="/scripts" icon="✍️" label="Scripts" />
+          <SidebarLink open={sidebarOpen} href="/ia" icon="🧠" label="IA" />
+          <SidebarLink open={sidebarOpen} href="/settings" icon="⚙️" label="Paramètres" />
         </nav>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-8">
+      <main className={`ml-${sidebarOpen ? '56' : '16'} flex-1 p-8 transition-all duration-300`}>
         {/* KPI Top Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
           <StatCard title="Revenus" value="€1420" />
@@ -107,11 +114,11 @@ export default function Dashboard() {
   );
 }
 
-function SidebarLink({ href, icon, label }) {
+function SidebarLink({ href, icon, label, open }) {
   return (
-    <Link href={href} className="flex items-center space-x-2 hover:text-purple-400">
+    <Link href={href} className="flex items-center space-x-3 hover:text-purple-400">
       <span className="text-xl">{icon}</span>
-      <span className="hidden lg:inline">{label}</span>
+      <span className={`${open ? 'inline' : 'hidden'} transition-opacity duration-200`}>{label}</span>
     </Link>
   );
 }
