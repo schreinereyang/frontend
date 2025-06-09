@@ -24,7 +24,7 @@ export default function ModelsPage() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({ name: '', age: '', file: null });
   const [message, setMessage] = useState('');
-  const [modelId, setModelId] = useState(null); // Identifiant de la modèle pour les cookies
+  const [modelId, setModelId] = useState(Math.random().toString(36).substring(2, 10));
 
   return (
     <LayoutDashboard>
@@ -76,24 +76,16 @@ export default function ModelsPage() {
 
         {step === 1 && (
           <div className="max-w-xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">🔐 Connexion OnlyFans
-            </h2>
+            <h2 className="text-2xl font-bold mb-4">🔐 Connexion OnlyFans</h2>
             <p className="text-sm text-gray-400 mb-4">
               Connecte-toi manuellement à OnlyFans dans la fenêtre intégrée pour capturer les cookies.
             </p>
             <div className="w-full h-96 bg-black mb-4 flex items-center justify-center border border-purple-600">
-              <p className="text-purple-500 text-center">
-                [🧪 IFRAME navigateur OF à intégrer ici]
-              </p>
+              <p className="text-purple-500 text-center">[🧪 IFRAME navigateur OF à intégrer ici]</p>
             </div>
             <OFConnectStatus
-              onSuccess={() => {
-                // Simule un ID généré ou lié au compte connecté
-                const id = Math.random().toString(36).substring(2, 10);
-                setModelId(id);
-                setStep(2);
-              }}
               modelId={modelId}
+              onSuccess={() => setStep(2)}
             />
           </div>
         )}
@@ -123,9 +115,7 @@ export default function ModelsPage() {
             />
             <button
               onClick={() =>
-                setMessage(
-                  '✅ Modèle enregistrée. ⚠️ L’IA ne sera pas activée tant que les infos minimales ne sont pas complètes.'
-                )
+                setMessage('✅ Modèle enregistrée. ⚠️ L’IA ne sera pas activée tant que les infos minimales ne sont pas complètes.')
               }
               className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded"
             >
