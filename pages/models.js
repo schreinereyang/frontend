@@ -24,7 +24,14 @@ export default function ModelsPage() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({ name: '', age: '', file: null });
   const [message, setMessage] = useState('');
-  const [modelId, setModelId] = useState(Math.random().toString(36).substring(2, 10));
+  const [modelId, setModelId] = useState(null);
+
+  const handleAddModel = () => {
+    const id = Math.random().toString(36).substring(2, 10);
+    console.log("✅ Nouveau modelId généré :", id);
+    setModelId(id);
+    setStep(1);
+  };
 
   return (
     <LayoutDashboard>
@@ -65,7 +72,7 @@ export default function ModelsPage() {
 
             <div className="mt-10 text-center">
               <button
-                onClick={() => setStep(1)}
+                onClick={handleAddModel}
                 className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded shadow"
               >
                 ➕ Ajouter une modèle
@@ -74,7 +81,7 @@ export default function ModelsPage() {
           </>
         )}
 
-        {step === 1 && (
+        {step === 1 && modelId && (
           <div className="max-w-xl mx-auto">
             <h2 className="text-2xl font-bold mb-4">🔐 Connexion OnlyFans</h2>
             <p className="text-sm text-gray-400 mb-4">
