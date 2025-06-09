@@ -1,41 +1,51 @@
-// components/LayoutDashboard.js
 import { useState } from 'react';
-import Link from 'next/link';
 
-const menu = [
-  { href: '/dashboard', icon: '📊', label: 'Dashboard' },
-  { href: '/import', icon: '📥', label: 'Import' },
-  { href: '/models', icon: '🤖', label: 'Modèles' },
-  { href: '/medias', icon: '🎥', label: 'Médias' },
-  { href: '/scripts', icon: '✍️', label: 'Scripts' },
-  { href: '/ia', icon: '🧠', label: 'IA' },
-  { href: '/settings', icon: '⚙️', label: 'Paramètres' },
-];
+export default function OFConnectStatus({ modelId, onSuccess }) {
+  const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
 
-export default function LayoutDashboard({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const handleConnect = async () => {
+    if (!modelId) {
+      setStatusMessage('⛔ Aucun ID de modèle fourni');
+      return;
+    }
+
+    setLoading(true);
+    setStatusMessage('Connexion au compte OnlyFans en cours...');
+
+    try {
+      const res = await fetch('http://163.172.134.56:3001/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modelId }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      setStatusMessage('✅ Connexion au compte OnlyFans réussie');
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error(err);
+      setStatusMessage('❌ Échec de la connexion au compte OnlyFans');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="flex min-h-screen bg-[#0b0f1a] text-white">
-      <aside
-        onMouseEnter={() => setSidebarOpen(true)}
-        onMouseLeave={() => setSidebarOpen(false)}
-        className={`bg-[#0b0f1a] border-r border-purple-800 p-4 transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-16'} overflow-hidden fixed h-screen z-10`}
+    <div className="text-center">
+      <button
+        onClick={handleConnect}
+        className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded flex items-center justify-center gap-2"
       >
-        <h1 className={`text-xl font-bold text-purple-400 transition-opacity ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>OnlyMoly</h1>
-        <nav className="space-y-6 mt-8">
-          {menu.map((m, i) => (
-            <Link key={i} href={m.href} className="flex items-center space-x-3 hover:text-purple-400">
-              <span className="text-xl">{m.icon}</span>
-              <span className={`${sidebarOpen ? 'inline' : 'hidden'} transition-opacity duration-200`}>{m.label}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      <main className={`ml-${sidebarOpen ? '56' : '16'} flex-1 p-8 transition-all duration-300`}>
-        {children}
-      </main>
+        {loading && (
+          <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+        )}
+        {loading ? 'Connexion en cours...' : '✅ Connexion terminée'}
+      </button>
+      {statusMessage && (
+        <p className="mt-4 text-sm text-yellow-400">{statusMessage}</p>
+      )}
     </div>
   );
 }
