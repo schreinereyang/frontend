@@ -33,7 +33,10 @@ export default function LayoutDashboard({ children }) {
         </nav>
       </aside>
 
-      <main className={`ml-${sidebarOpen ? '56' : '16'} flex-1 p-8 transition-all duration-300`}>
+      <main
+        className="transition-all duration-300 flex-1 p-6"
+        style={{ marginLeft: sidebarOpen ? '14rem' : '4rem' }} // 224px ou 64px
+      >
         {children}
       </main>
     </div>
