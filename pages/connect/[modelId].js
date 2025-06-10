@@ -55,7 +55,17 @@ export default function ConnectModel() {
           ✅ Connexion détectée ! Redirection...
         </p>
       ) : (
-        <Loader base="🕐 En attente de connexion" />
+        <>
+          <Loader base="🕐 En attente de connexion" />
+          <div className="mt-8">
+            <button
+              onClick={() => router.push('/models')}
+              className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition"
+            >
+              ❌ Annuler la connexion
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
