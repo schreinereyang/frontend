@@ -1,11 +1,12 @@
 // pages/connect/[modelId].js
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import Loader from '../../components/Loader';
 
 export default function ConnectModel() {
   const router = useRouter();
   const { modelId } = router.query;
-  const [status, setStatus] = useState('🕐 En attente de connexion...');
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     if (!modelId) return;
@@ -16,7 +17,7 @@ export default function ConnectModel() {
         const data = await res.json();
 
         if (data?.connected) {
-          setStatus('✅ Connexion détectée ! Redirection...');
+          setConnected(true);
           clearInterval(interval);
           setTimeout(() => router.push('/models'), 2000);
         } else {
@@ -49,7 +50,13 @@ export default function ConnectModel() {
         />
       </div>
 
-      <p className="mt-6 text-yellow-400 text-sm text-center">{status}</p>
+      {connected ? (
+        <p className="mt-6 text-green-400 text-sm text-center">
+          ✅ Connexion détectée ! Redirection...
+        </p>
+      ) : (
+        <Loader base="🕐 En attente de connexion" />
+      )}
     </div>
   );
 }
