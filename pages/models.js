@@ -1,7 +1,7 @@
 // pages/models.js
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import LayoutDashboard from '@/components/LayoutDashboard';
+import LayoutDashboard from '../components/LayoutDashboard';
 
 export default function ModelsPage() {
   const router = useRouter();
