@@ -1,32 +1,21 @@
+// components/OFConnectStatus.jsx
 import { useState } from 'react';
 
-export default function OFConnectStatus({ modelId, onSuccess }) {
+export default function OFConnectStatus({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
   const handleConnect = async () => {
-    if (!modelId) {
-      setStatusMessage('⛔ Aucun ID de modèle fourni');
-      return;
-    }
-
     setLoading(true);
     setStatusMessage('Connexion au compte OnlyFans en cours...');
-
     try {
-      const res = await fetch('http://163.172.134.56:3001/connect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modelId }),
-      });
-
+      const res = await fetch('http://TON_IP_VPS:3001/connect', { method: 'POST' });
       if (!res.ok) throw new Error();
-
       setStatusMessage('✅ Connexion au compte OnlyFans réussie');
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error(err);
-      setStatusMessage('❌ Échec de la connexion au compte OnlyFans');
+      setStatusMessage('❌ Connexion au compte OnlyFans échouée');
     } finally {
       setLoading(false);
     }
@@ -43,6 +32,7 @@ export default function OFConnectStatus({ modelId, onSuccess }) {
         )}
         {loading ? 'Connexion en cours...' : '✅ Connexion terminée'}
       </button>
+
       {statusMessage && (
         <p className="mt-4 text-sm text-yellow-400">{statusMessage}</p>
       )}
