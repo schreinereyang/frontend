@@ -1,5 +1,4 @@
-// components/LayoutDashboard.js
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import Link from 'next/link';
 
 const menu = [
@@ -12,7 +11,11 @@ const menu = [
   { href: '/settings', icon: '⚙️', label: 'Paramètres' },
 ];
 
-export default function LayoutDashboard({ children }) {
+interface LayoutDashboardProps {
+  children: ReactNode;
+}
+
+export default function LayoutDashboard({ children }: LayoutDashboardProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -22,7 +25,9 @@ export default function LayoutDashboard({ children }) {
         onMouseLeave={() => setSidebarOpen(false)}
         className={`bg-[#0b0f1a] border-r border-purple-800 p-4 transition-all duration-300 ${sidebarOpen ? 'w-56' : 'w-16'} overflow-hidden fixed h-screen z-10`}
       >
-        <h1 className={`text-xl font-bold text-purple-400 transition-opacity ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>OnlyMoly</h1>
+        <h1 className={`text-xl font-bold text-purple-400 transition-opacity ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+          OnlyMoly
+        </h1>
         <nav className="space-y-6 mt-8">
           {menu.map((m, i) => (
             <Link key={i} href={m.href} className="flex items-center space-x-3 hover:text-purple-400">
