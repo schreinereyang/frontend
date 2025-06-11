@@ -1,6 +1,6 @@
 // pages/import.js
 import { useState } from 'react';
-import LayoutDashboard from '@/components/LayoutDashboard';
+import LayoutDashboard from '../components/LayoutDashboard';
 
 export default function ImportPage() {
   const [persona, setPersona] = useState(null);
