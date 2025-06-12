@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-// @ts-ignore
-import OpenAI from "openai";
+const OpenAI = require("openai");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
