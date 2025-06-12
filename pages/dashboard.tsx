@@ -1,50 +1,100 @@
+import { useState } from "react";
 import LayoutDashboard from "../components/LayoutDashboard";
 import CardSection from "../components/CardSection";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+} from "recharts";
 
-const fakeData = [
-  { day: "Lun", sales: 120 },
-  { day: "Mar", sales: 190 },
-  { day: "Mer", sales: 75 },
-  { day: "Jeu", sales: 210 },
-  { day: "Ven", sales: 130 },
-  { day: "Sam", sales: 80 },
-  { day: "Dim", sales: 150 },
-];
+const fakeStats = {
+  revenue: 1480,
+  messages: 265,
+  mediaSold: 37,
+  subscribers: 122,
+  models: 4
+};
 
-const total = fakeData.reduce((acc, d) => acc + d.sales, 0);
+const periods = ["jour", "semaine", "mois", "90j"];
+const fakeChart = {
+  jour: [
+    { label: "Aujourd’hui", sales: 120 },
+  ],
+  semaine: [
+    { label: "Lun", sales: 120 },
+    { label: "Mar", sales: 180 },
+    { label: "Mer", sales: 90 },
+    { label: "Jeu", sales: 200 },
+    { label: "Ven", sales: 150 },
+    { label: "Sam", sales: 70 },
+    { label: "Dim", sales: 130 },
+  ],
+  mois: Array.from({ length: 30 }, (_, i) => ({ label: `J${i + 1}`, sales: Math.floor(Math.random() * 200) })),
+  "90j": Array.from({ length: 12 }, (_, i) => ({ label: `S${i + 1}`, sales: Math.floor(Math.random() * 500) }))
+};
 
-export default function DashboardPage() {
+export default function Dashboard() {
+  const [selectedPeriod, setSelectedPeriod] = useState<"jour" | "semaine" | "mois" | "90j">("semaine");
+
   return (
     <LayoutDashboard>
-      <div className="text-white space-y-8">
-        <h1 className="text-3xl font-bold">📊 Dashboard général</h1>
+      <div className="text-white space-y-6">
+        <h1 className="text-4xl font-extrabold text-purple-400">ONLYMOLY</h1>
 
+        {/* Résumé rapide */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+          <CardSection className="text-center">
+            <p className="text-xs text-gray-400">Chiffre d'affaires</p>
+            <p className="text-2xl font-bold text-purple-400">€{fakeStats.revenue}</p>
+          </CardSection>
+          <CardSection className="text-center">
+            <p className="text-xs text-gray-400">Messages envoyés</p>
+            <p className="text-2xl font-bold text-purple-400">{fakeStats.messages}</p>
+          </CardSection>
+          <CardSection className="text-center">
+            <p className="text-xs text-gray-400">Médias vendus</p>
+            <p className="text-2xl font-bold text-purple-400">{fakeStats.mediaSold}</p>
+          </CardSection>
+          <CardSection className="text-center">
+            <p className="text-xs text-gray-400">Abonnés actifs</p>
+            <p className="text-2xl font-bold text-purple-400">{fakeStats.subscribers}</p>
+          </CardSection>
+          <CardSection className="text-center">
+            <p className="text-xs text-gray-400">Modèles actives</p>
+            <p className="text-2xl font-bold text-purple-400">{fakeStats.models}</p>
+          </CardSection>
+        </div>
+
+        {/* Filtres */}
+        <div className="flex gap-2">
+          {periods.map((p) => (
+            <button
+              key={p}
+              onClick={() => setSelectedPeriod(p as any)}
+              className={`px-4 py-2 rounded border text-sm ${
+                selectedPeriod === p
+                  ? "bg-purple-700 text-white"
+                  : "bg-gray-800 text-gray-400 border-gray-600 hover:bg-gray-700"
+              }`}
+            >
+              {p === "jour" ? "Aujourd’hui" :
+               p === "semaine" ? "Cette semaine" :
+               p === "mois" ? "Ce mois-ci" : "90 derniers jours"}
+            </button>
+          ))}
+        </div>
+
+        {/* Graphique */}
         <CardSection>
-          <h2 className="text-xl font-semibold mb-2 text-purple-300">Ventes cette semaine (€)</h2>
-          <p className="text-sm text-gray-400 mb-4">Total : {total} €</p>
+          <h2 className="text-lg font-semibold text-purple-300 mb-2">Ventes ({selectedPeriod})</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={fakeData}>
-                <XAxis dataKey="day" stroke="#ccc" />
+              <BarChart data={fakeChart[selectedPeriod]}>
+                <XAxis dataKey="label" stroke="#ccc" />
                 <YAxis stroke="#ccc" />
                 <Tooltip />
                 <Bar dataKey="sales" fill="#a855f7" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </CardSection>
-
-        <CardSection>
-          <h2 className="text-xl font-semibold mb-2 text-purple-300">Modèles actifs</h2>
-          <ul className="text-sm text-gray-300 space-y-2">
-            <li className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-400"></span> Elii (21 ans)
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-gray-500"></span> Sofia (23 ans)
-            </li>
-          </ul>
         </CardSection>
       </div>
     </LayoutDashboard>
