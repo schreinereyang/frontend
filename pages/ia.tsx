@@ -1,30 +1,96 @@
+import { useState } from "react";
 import LayoutDashboard from "../components/LayoutDashboard";
 import CardSection from "../components/CardSection";
 
-export default function Ia() {
+export default function IaPage() {
+  const [input, setInput] = useState("");
+  const [history, setHistory] = useState<{ sender: string; text: string }[]>([]);
+  const [correctionMode, setCorrectionMode] = useState(false);
+  const [correction, setCorrection] = useState("");
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    const newHistory = [...history, { sender: "🧠 Modérateur", text: input }];
+    setHistory(newHistory);
+    setInput("");
+
+    setTimeout(() => {
+      const aiResponse = `🤖 GPT : Merci pour ton message, je prends note !`;
+      setHistory((prev) => [...prev, { sender: "🤖 IA", text: aiResponse }]);
+    }, 800);
+  };
+
+  const applyCorrection = () => {
+    if (!correction.trim()) return;
+    setHistory((prev) => [
+      ...prev,
+      { sender: "✏️ Correction", text: correction }
+    ]);
+    setCorrection("");
+    setCorrectionMode(false);
+  };
+
   return (
     <LayoutDashboard>
-      <div className="mb-4 text-2xl font-bold text-purple-300">🧠 Intelligence Artificielle</div>
-
-      <CardSection>
-        <p className="text-gray-300 text-sm">
-          Ici, tu pourras gérer ton assistant IA connecté à GPT-4 : fichiers attachés, modèle utilisé,
-          stratégie d'entraînement, redémarrage, etc.
+      <div className="space-y-4 text-white">
+        <h1 className="text-3xl font-bold text-purple-300">🧠 Entraînement IA</h1>
+        <p className="text-sm text-gray-400">
+          Tu es en lien direct avec le cœur du GPT OnlyMoly. Ici, chaque message que tu échanges aide à rendre l’IA plus intelligente, pour toi et pour tous les modèles de la plateforme.
         </p>
-      </CardSection>
 
-      <CardSection className="mt-4">
-        <ul className="text-sm text-white space-y-2">
-          <li>✅ Assistant connecté : <span className="text-purple-400 font-mono">asst_r1l8vGPUUwmul0wGKDZiJj6m</span></li>
-          <li>🧠 Modèle utilisé : <span className="text-green-400 font-semibold">gpt-4-turbo</span></li>
-          <li>📎 Fichiers liés :
-            <ul className="pl-4 list-disc text-gray-400 text-xs">
-              <li><code>medias.json</code> — contenu vendable</li>
-              <li><code>script_complete.json</code> — funnel de vente</li>
-            </ul>
-          </li>
-        </ul>
-      </CardSection>
+        <CardSection>
+          <div className="h-96 overflow-y-auto space-y-3 p-2">
+            {history.map((h, i) => (
+              <div key={i} className="text-sm">
+                <span className="font-semibold">{h.sender}:</span> {h.text}
+              </div>
+            ))}
+          </div>
+        </CardSection>
+
+        <CardSection>
+          {correctionMode ? (
+            <div className="space-y-2">
+              <textarea
+                value={correction}
+                onChange={(e) => setCorrection(e.target.value)}
+                placeholder="Corrige la réponse de l'IA ici..."
+                className="w-full p-2 bg-gray-800 rounded"
+              />
+              <button
+                onClick={applyCorrection}
+                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
+              >
+                ✅ Appliquer la correction
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Écris comme si tu étais un fan..."
+                className="w-full p-2 bg-gray-800 rounded"
+              />
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleSend}
+                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white"
+                >
+                  📨 Envoyer
+                </button>
+                <button
+                  onClick={() => setCorrectionMode(true)}
+                  className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white"
+                >
+                  ✏️ Corriger l'IA
+                </button>
+              </div>
+            </div>
+          )}
+        </CardSection>
+      </div>
     </LayoutDashboard>
   );
 }
