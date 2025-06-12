@@ -7,18 +7,38 @@ export default function IaPage() {
   const [history, setHistory] = useState<{ sender: string; text: string }[]>([]);
   const [correctionMode, setCorrectionMode] = useState(false);
   const [correction, setCorrection] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
 
     const newHistory = [...history, { sender: "🧠 Modérateur", text: input }];
     setHistory(newHistory);
     setInput("");
+    setLoading(true);
 
-    setTimeout(() => {
-      const aiResponse = `🤖 GPT : Merci pour ton message, je prends note !`;
-      setHistory((prev) => [...prev, { sender: "🤖 IA", text: aiResponse }]);
-    }, 800);
+    try {
+      const res = await fetch("/api/ia-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      });
+
+      const data = await res.json();
+
+      setHistory((prev) => [
+        ...prev,
+        { sender: "🤖 IA", text: data.reply || "Réponse vide" },
+      ]);
+    } catch (err) {
+      console.error("Erreur IA:", err);
+      setHistory((prev) => [
+        ...prev,
+        { sender: "🤖 IA", text: "❌ Erreur lors de l'appel GPT." },
+      ]);
+    }
+
+    setLoading(false);
   };
 
   const applyCorrection = () => {
@@ -76,9 +96,10 @@ export default function IaPage() {
               <div className="flex space-x-2">
                 <button
                   onClick={handleSend}
+                  disabled={loading}
                   className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white"
                 >
-                  📨 Envoyer
+                  {loading ? "⏳ En cours..." : "📨 Envoyer"}
                 </button>
                 <button
                   onClick={() => setCorrectionMode(true)}
