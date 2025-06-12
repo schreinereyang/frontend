@@ -1,75 +1,58 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import LayoutDashboard from '../components/LayoutDashboard';
-import CardSection from '../components/CardSection';
+import { useEffect, useState } from "react";
+import LayoutDashboard from "../components/LayoutDashboard";
+import CardSection from "../components/CardSection";
 
-type Model = {
-  id: number;
-  name: string;
-  age: number;
-  active: boolean;
-  earnings: number;
-  recentMessages: string[];
-  created_at: string;
+type Media = {
+  id: string;
+  title: string;
+  category: string;
+  price: number;
 };
 
-export default function ModelsPage() {
-  const router = useRouter();
-  const [models, setModels] = useState<Model[]>([]);
+export default function MediasPage() {
+  const [medias, setMedias] = useState<Media[]>([]);
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    fetch('/api/models')
+    // Remplace cette URL par ton vrai endpoint ou charge un fichier JSON local
+    fetch("/api/medias")
       .then((res) => res.json())
-      .then((data) => setModels(data.models || []))
-      .catch((err) => console.error('Erreur chargement modèles:', err));
+      .then((data) => setMedias(data.medias || []))
+      .catch((err) => console.error("Erreur chargement des médias:", err));
   }, []);
 
-  const handleAddModel = () => {
-    const id = Math.random().toString(36).substring(2, 10);
-    router.push(`/connect/${id}`);
-  };
+  const filteredMedias = medias.filter((m) =>
+    filter ? m.category.toLowerCase().includes(filter.toLowerCase()) : true
+  );
 
   return (
     <LayoutDashboard>
-      <div className="text-white">
-        <h1 className="text-3xl font-bold mb-6">🤖 Modèles IA</h1>
+      <div className="text-white space-y-6">
+        <h1 className="text-3xl font-bold text-purple-300">🎥 Tous les médias</h1>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {models.map((m) => (
-            <CardSection
-              key={m.id}
-              className="cursor-pointer hover:border-purple-400 transition"
-              onClick={() => router.push(`/models/${m.id}`)}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-semibold text-purple-400">{m.name}</h3>
-                <span className={`text-sm ${m.active ? 'text-green-400' : 'text-red-400'}`}>
-                  {m.active ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-              <p className="text-sm text-gray-400">Âge : {m.age}</p>
-              <p className="text-sm text-gray-400">Ventes : €{m.earnings}</p>
-              <p className="text-sm text-gray-500">Ajoutée le : {new Date(m.created_at).toLocaleDateString()}</p>
+        <input
+          type="text"
+          placeholder="Filtrer par catégorie..."
+          className="bg-gray-800 p-2 rounded w-full"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
 
-              {m.recentMessages?.length > 0 && (
-                <div className="mt-2 text-sm text-gray-300 space-y-1">
-                  {m.recentMessages.slice(0, 3).map((msg, j) => (
-                    <p key={j} className="truncate">💬 {msg}</p>
-                  ))}
+        <CardSection>
+          <ul className="divide-y divide-gray-700 text-sm">
+            {filteredMedias.map((m) => (
+              <li key={m.id} className="py-2">
+                <div className="flex justify-between">
+                  <span>📸 <strong>{m.title}</strong> <em className="text-gray-400">({m.category})</em></span>
+                  <span className="text-purple-400 font-semibold">${m.price}</span>
                 </div>
-              )}
-            </CardSection>
-          ))}
-        </div>
-
-        <div className="mt-10 text-center">
-          <button
-            onClick={handleAddModel}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded shadow"
-          >
-            ➕ Ajouter une modèle
-          </button>
-        </div>
+              </li>
+            ))}
+            {filteredMedias.length === 0 && (
+              <li className="text-gray-400 text-center py-4">Aucun média trouvé.</li>
+            )}
+          </ul>
+        </CardSection>
       </div>
     </LayoutDashboard>
   );
