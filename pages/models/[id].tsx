@@ -20,23 +20,30 @@ export default function ModelDetailsPage() {
   const [model, setModel] = useState<ModelDetail | null>(null);
   const [connected, setConnected] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      fetch(`/api/models/${id}`)
-        .then((res) => res.json())
-        .then((data) => setModel(data.model))
-        .catch((err) => console.error('Erreur chargement modèle:', err));
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-      fetch(`/api/cookies/check?modelId=${id}`, {
-        headers: {
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-        }
+  useEffect(() => {
+    if (!id || !BACKEND_URL) return;
+
+    // ✅ Récupère les infos du modèle
+    fetch(`${BACKEND_URL}/api/models/${id}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Modèle non trouvé");
+        const data = await res.json();
+        setModel(data.model);
       })
-        .then(res => res.json())
-        .then(data => setConnected(data.connected))
-        .catch(() => setConnected(false));
-    }
-  }, [id]);
+      .catch((err) => console.error('Erreur chargement modèle:', err));
+
+    // ✅ Vérifie si le modèle est connecté à OnlyFans
+    fetch(`${BACKEND_URL}/api/cookies/check?modelId=${id}`, {
+      headers: {
+        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+      }
+    })
+      .then(res => res.json())
+      .then(data => setConnected(data.connected))
+      .catch(() => setConnected(false));
+  }, [id, BACKEND_URL]);
 
   if (!model) return null;
 
@@ -82,7 +89,7 @@ export default function ModelDetailsPage() {
             onClick={async () => {
               const cookie = prompt("Colle ici ton cookie OnlyFans (ex: auth_id=...)");
               if (!cookie || !model?.id) return;
-              const res = await fetch('/api/cookies/save', {
+              const res = await fetch(`${BACKEND_URL}/api/cookies/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ modelId: model.id, cookie }),
