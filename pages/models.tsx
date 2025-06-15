@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import LayoutDashboard from '../components/LayoutDashboard';
-import CardSection from '../components/CardSection';
+import LayoutDashboard from '../../components/LayoutDashboard';
+import CardSection from '../../components/CardSection';
 
 type Model = {
   id: number;
@@ -16,17 +16,34 @@ type Model = {
 export default function ModelsPage() {
   const router = useRouter();
   const [models, setModels] = useState<Model[]>([]);
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
-    fetch('/api/models')
+    fetch(`${BACKEND_URL}/api/models`)
       .then((res) => res.json())
       .then((data) => setModels(data.models || []))
       .catch((err) => console.error('Erreur chargement modèles:', err));
-  }, []);
+  }, [BACKEND_URL]);
 
-  const handleAddModel = () => {
-    const id = Math.random().toString(36).substring(2, 10);
-    router.push(`/connect/${id}`);
+  const handleAddModel = async () => {
+    const name = prompt("Nom de la modèle ?");
+    const age = prompt("Âge de la modèle ?");
+
+    if (!name || !age) return;
+
+    const res = await fetch(`${BACKEND_URL}/api/models/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, age })
+    });
+
+    const data = await res.json();
+
+    if (data.modelId) {
+      router.push(`/connect/${data.modelId}`);
+    } else {
+      alert("❌ Erreur lors de la création de la modèle");
+    }
   };
 
   return (
