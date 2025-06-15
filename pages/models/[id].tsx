@@ -16,7 +16,9 @@ type ModelDetail = {
 export default function ModelDetailsPage() {
   const router = useRouter();
   const { id } = router.query;
+
   const [model, setModel] = useState<ModelDetail | null>(null);
+  const [connected, setConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -24,6 +26,15 @@ export default function ModelDetailsPage() {
         .then((res) => res.json())
         .then((data) => setModel(data.model))
         .catch((err) => console.error('Erreur chargement modèle:', err));
+
+      fetch(`/api/cookies/check?modelId=${id}`, {
+        headers: {
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+        }
+      })
+        .then(res => res.json())
+        .then(data => setConnected(data.connected))
+        .catch(() => setConnected(false));
     }
   }, [id]);
 
@@ -59,6 +70,34 @@ export default function ModelDetailsPage() {
               <li key={idx}>• {msg}</li>
             ))}
           </ul>
+        </CardSection>
+
+        <CardSection>
+          <h2 className="text-xl font-semibold text-purple-300 mb-2">Connexion OnlyFans</h2>
+          <p className="text-sm text-gray-300 mb-3">
+            Statut : {connected === true ? "✅ Connectée" : connected === false ? "❌ Non connectée" : "⏳ Vérification..."}
+          </p>
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded shadow"
+            onClick={async () => {
+              const cookie = prompt("Colle ici ton cookie OnlyFans (ex: auth_id=...)");
+              if (!cookie || !model?.id) return;
+              const res = await fetch('/api/cookies/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ modelId: model.id, cookie }),
+              });
+              const result = await res.json();
+              if (result.success) {
+                alert("✅ Cookie enregistré !");
+                setConnected(true);
+              } else {
+                alert("❌ Erreur lors de l'enregistrement");
+              }
+            }}
+          >
+            🔐 Connecter à OnlyFans
+          </button>
         </CardSection>
 
         <div className="text-center">
